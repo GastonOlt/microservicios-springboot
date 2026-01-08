@@ -1,4 +1,4 @@
-package com.gaston.springcloud.msvc.products.msvc_products;
+package com.gaston.springcloud.msvc.products;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
