@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.http.MediaType;
+// import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -24,19 +25,24 @@ public class SampleGlobalFilter implements GlobalFilter,Ordered {
 
         logger.info("ejecutando el filtro antes del request PRE");
 
-        exchange.getRequest().mutate().headers(h -> h.add("token", "12345"));
+        ServerHttpRequest requestMutated = exchange.getRequest().mutate()
+                 .header("token", "12345")
+                 .build();
 
-        return chain.filter(exchange).then(Mono.fromRunnable(() -> {
+        ServerWebExchange exchangeMutated = exchange.mutate()
+                 .request(requestMutated)
+                 .build();
+
+        return chain.filter(exchangeMutated).then(Mono.fromRunnable(() -> {
             logger.info("ejecutando el filtro despues del request POST");
 
-            Optional.ofNullable(exchange.getRequest().getHeaders().getFirst("token")).ifPresent(token -> {
+            Optional.ofNullable(exchangeMutated.getRequest().getHeaders().getFirst("token")).ifPresent(token -> {
                 logger.info("token en response post filter: " + token);
-                exchange.getResponse().getHeaders().add("token", token);
+                exchangeMutated.getResponse().getHeaders().add("token", token);
             });
-            
-            exchange.getResponse().getCookies().add("color",ResponseCookie.from("color", "red").build());
-            exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_PLAIN);
 
+            exchangeMutated.getResponse().getCookies().add("color",ResponseCookie.from("color", "red").build());
+            // exchangeMutated.getResponse().getHeaders().setContentType(MediaType.TEXT_PLAIN);
         }));
     }
 

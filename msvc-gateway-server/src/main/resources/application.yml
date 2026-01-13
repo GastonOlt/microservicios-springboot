@@ -1,16 +1,27 @@
 spring:
   cloud:
     gateway:
-      routes:
-      - id: msvc-products
-        uri: lb://msvc-products
-        predicates:
-        - Path=/api/products/**
-        filters:
-        - StripPrefix=2
-      - id: msvc-items
-        uri: lb://msvc-items
-        predicates:
-        - Path=/api/items/**
-        filters:
-        - StripPrefix=2
+      server:
+        webflux:
+          routes:
+          - id: msvc-products
+            uri: lb://msvc-products
+            predicates:
+            - Path=/api/products/**
+            filters:
+            - StripPrefix=2
+            - name: SampleCookie
+              args:
+                name: user
+                value: user1234
+                message: mensaje desde gateway para products
+          - id: msvc-items
+            uri: lb://msvc-items
+            predicates:
+            - Path=/api/items/**
+            filters:
+            - StripPrefix=2
+            - AddRequestHeader=token-request, abc123
+            - AddResponseHeader=token-response, xyz789
+            - AddRequestParameter=nombre, pepe
+            - SetResponseHeader=Content-Type, text/plain
