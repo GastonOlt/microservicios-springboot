@@ -1,0 +1,21 @@
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        sliding-window-size: 6
+        failure-rate-threshold: 5
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-duration-threshold: 3s
+        slow-call-rate-threshold: 50
+    instances:
+      items:
+        baseConfig: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 4s
+    instances:
+      items:
+        baseConfig: default
