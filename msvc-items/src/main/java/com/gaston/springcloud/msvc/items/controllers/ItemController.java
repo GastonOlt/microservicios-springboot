@@ -3,12 +3,17 @@ package com.gaston.springcloud.msvc.items.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gaston.springcloud.msvc.items.models.Item;
+import com.gaston.springcloud.msvc.items.models.Product;
 import com.gaston.springcloud.msvc.items.services.ItemService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,9 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemController {
 
     private final ItemService itemService;
+    private final CircuitBreakerFactory circuitBreakerFactory;
+    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-    public ItemController(@Qualifier("itemServiceWebClient") ItemService itemService) {
+    public ItemController(@Qualifier("itemServiceWebClient") ItemService itemService, CircuitBreakerFactory circuitBreakerFactory) {
         this.itemService = itemService;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @GetMapping
@@ -35,7 +43,18 @@ public class ItemController {
     
     @GetMapping("{id}")
     public ResponseEntity<Item> details(@PathVariable Long id) {
-        Optional<Item> itemOptional = itemService.findById(id);
+        Optional<Item> itemOptional =  circuitBreakerFactory.create("items")
+            .run(() -> itemService.findById(id), e -> {
+                logger.error(e.getMessage());
+                
+                Product product = new Product();
+                product.setId(1L);
+                product.setCreateAt(LocalDate.now());
+                product.setName("Camara Sony");
+                product.setPrice(500.00);
+                return Optional.of(new Item(product, 3));
+            });
+
         if (itemOptional.isPresent()) {
             return ResponseEntity.ok(itemOptional.orElseThrow());
         }
