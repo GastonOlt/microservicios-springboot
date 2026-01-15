@@ -6,9 +6,13 @@ import com.gaston.springcloud.msvc.items.models.Item;
 import com.gaston.springcloud.msvc.items.models.Product;
 import com.gaston.springcloud.msvc.items.services.ItemService;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,4 +65,54 @@ public class ItemController {
         return ResponseEntity.notFound().build();
     }
     
+    @CircuitBreaker(name = "items",fallbackMethod = "fallbackMethod")
+    @GetMapping("/details/{id}")
+    public ResponseEntity<Item> details2(@PathVariable Long id) {
+        Optional<Item> itemOptional = itemService.findById(id);
+
+        if (itemOptional.isPresent()) {
+            return ResponseEntity.ok(itemOptional.orElseThrow());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @CircuitBreaker(name = "items", fallbackMethod = "fallbackMethod2")
+    @TimeLimiter (name = "items")
+    @GetMapping("/details2/{id}")
+    public CompletableFuture<?> details3(@PathVariable Long id) {
+       return CompletableFuture.supplyAsync(() -> {
+            Optional<Item> itemOptional = itemService.findById(id);
+
+            if (itemOptional.isPresent()) {
+                return ResponseEntity.ok(itemOptional.orElseThrow());
+            }
+            return ResponseEntity.notFound().build();
+        });
+    }
+
+    public ResponseEntity<Item> fallbackMethod(Throwable e) {
+        logger.error(e.getMessage());
+        
+        Product product = new Product();
+        product.setId(1L);
+        product.setCreateAt(LocalDate.now());
+        product.setName("Camara Sony Nueva");
+        product.setPrice(500.00);
+        Item item = new Item(product, 3);
+        return ResponseEntity.ok(item);
+    }
+
+    public CompletableFuture<?> fallbackMethod2(Throwable e) {
+        return CompletableFuture.supplyAsync(() -> {
+            logger.error(e.getMessage());
+
+            Product product = new Product();
+            product.setId(1L);
+            product.setCreateAt(LocalDate.now());
+            product.setName("Camara Sony fallbackMethod2");
+            product.setPrice(500.00);
+            Item item = new Item(product, 3);
+            return ResponseEntity.ok(item);
+        });
+    }
 }
