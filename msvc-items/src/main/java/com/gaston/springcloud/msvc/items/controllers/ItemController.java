@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,12 +32,19 @@ public class ItemController {
     private final ItemService itemService;
     private final CircuitBreakerFactory circuitBreakerFactory;
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
+    @Value("${configuracion.texto}")
+    private String msg;
 
     public ItemController(@Qualifier("itemServiceWebClient") ItemService itemService, CircuitBreakerFactory circuitBreakerFactory) {
         this.itemService = itemService;
         this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
+    @GetMapping("/fetch-configs")
+    public String fetchConfigs() {
+        return msg;
+    }
+    
     @GetMapping
     public List<Item> list(@RequestParam(name = "nombre", required = false) String nombre,
                             @RequestHeader(name = "token-request", required = false) String toker) {
