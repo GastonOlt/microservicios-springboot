@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient.Builder;
 import com.gaston.springcloud.msvc.items.models.Item;
 import com.gaston.springcloud.msvc.items.models.Product;
 
+
 @Service
 public class ItemServiceWebClient implements ItemService {
 
@@ -52,5 +53,41 @@ public class ItemServiceWebClient implements ItemService {
         // }
        
     }
+
+    @Override
+    public Product save(Product product) {
+        return webClient.build()
+                .post()
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+
+    @Override
+    public Product update(Long id, Product product) {
+        return webClient.build()
+                .put()
+                .uri("/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+    
+    @Override
+    public void deleteById(Long id) {
+        webClient.build()
+                .delete()
+                .uri("/{id}", id)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
 
 }

@@ -48,13 +48,6 @@ public class ProductServiceImp implements ProductService {
     
     @Override
     @Transactional
-    public Product update(Long id, Product product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-    
-    @Override
-    @Transactional
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
