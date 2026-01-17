@@ -6,9 +6,9 @@ import java.util.Random;
 
 import org.springframework.stereotype.Service;
 
+import com.gaston.libs.msvc.commons.entities.Product;
 import com.gaston.springcloud.msvc.items.clients.ProductFeignClient;
 import com.gaston.springcloud.msvc.items.models.Item;
-import com.gaston.springcloud.msvc.items.models.Product;
 
 import feign.FeignException;
 

@@ -2,7 +2,7 @@ package com.gaston.springcloud.msvc.products.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gaston.springcloud.msvc.products.entities.Product;
+import com.gaston.libs.msvc.commons.entities.Product;
 import com.gaston.springcloud.msvc.products.services.ProductService;
 
 import java.util.List;

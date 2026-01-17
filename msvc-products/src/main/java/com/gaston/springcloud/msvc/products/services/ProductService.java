@@ -3,7 +3,8 @@ package com.gaston.springcloud.msvc.products.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.gaston.springcloud.msvc.products.entities.Product;
+import com.gaston.libs.msvc.commons.entities.Product;
+
 
 public interface ProductService {
      

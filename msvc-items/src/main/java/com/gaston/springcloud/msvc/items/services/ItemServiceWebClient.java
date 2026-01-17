@@ -11,8 +11,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 // import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClient.Builder;
 
+import com.gaston.libs.msvc.commons.entities.Product;
 import com.gaston.springcloud.msvc.items.models.Item;
-import com.gaston.springcloud.msvc.items.models.Product;
 
 
 @Service

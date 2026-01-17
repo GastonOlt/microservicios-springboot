@@ -1,4 +1,4 @@
-package com.gaston.springcloud.msvc.products.entities;
+package com.gaston.libs.msvc.commons.entities;
 
 import java.time.LocalDate;
 

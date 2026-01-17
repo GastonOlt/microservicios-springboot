@@ -1,5 +1,7 @@
 package com.gaston.springcloud.msvc.items.models;
 
+import com.gaston.libs.msvc.commons.entities.Product;
+
 public class Item {
 
     private Product product;
