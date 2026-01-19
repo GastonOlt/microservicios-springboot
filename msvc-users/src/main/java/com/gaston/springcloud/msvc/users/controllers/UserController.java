@@ -8,7 +8,6 @@ import com.gaston.springcloud.msvc.users.services.IUserService;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,30 +21,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class UserController {
 
     private final IUserService userService;
-    private final PasswordEncoder  passwordEncoder;
-    public UserController(IUserService userService, PasswordEncoder passwordEncoder) {
+    
+    public UserController(IUserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.ok(userService.saveUser(user));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        Optional<User> existingUserOpt = userService.findById(id);
-        return existingUserOpt.map(existingUser -> {
-            existingUser.setUsername(user.getUsername());
-            existingUser.setEmail(user.getEmail());
-            if(user.isEnabled() != null){
-                existingUser.setEnabled(user.isEnabled());
-            }
-            User updatedUser = userService.saveUser(existingUser);
-            return ResponseEntity.ok(updatedUser);
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<User> updatedUserOpt = userService.updateUser(id, user);
+        return updatedUserOpt.map(ResponseEntity::ok)
+                              .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
