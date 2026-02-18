@@ -31,7 +31,7 @@ public class UsersService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            logger.info("Iniciando búsqueda de usuario: {}", username);
+            logger.info("Ingresando al proceso de login UsersService::loadUserByUsername con {}", username);
             
             User user = client.build()
                     .get()
@@ -41,20 +41,14 @@ public class UsersService implements UserDetailsService {
                     .bodyToMono(User.class)
                     .block();
             
-            if (user == null) {
-                logger.error("Usuario no encontrado: {}", username);
-                throw new UsernameNotFoundException("Usuario no encontrado: " + username);
-            }
-            
-            logger.info("Usuario encontrado: {} con {} roles", username, user.getRoles().size());
-        
             List<GrantedAuthority> roles = user.getRoles()
                     .stream()
                     .map(role -> new SimpleGrantedAuthority(role.getName()))
                     .collect(Collectors.toList());
             
-            logger.debug("Roles asignados: {}", roles);
            
+            logger.info("se ha realizado el login con exito  by username: {}", user);
+            
             return new org.springframework.security.core.userdetails.User(
                     user.getUsername(), 
                     user.getPassword(), 
@@ -65,11 +59,11 @@ public class UsersService implements UserDetailsService {
                     roles);
        
         } catch (WebClientResponseException e) {
-            logger.error("Error en WebClient al buscar usuario {}: {} - {}", username, e.getStatusCode(), e.getResponseBodyAsString());
             throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         } catch (Exception e) {
-            logger.error("Error inesperado al cargar usuario {}: {}", username, e.getMessage(), e);
-            throw new UsernameNotFoundException("Error al cargar usuario: " + username);
+            String errorMsg = "Error en el login , no existe user '" + username + "' en el sistema ";
+            logger.error(errorMsg);
+            throw new UsernameNotFoundException(errorMsg);
         }
     }
 

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class ProductController {
 
     private final ProductService productService;
+    private final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     public ProductController(ProductService productService) {
         this.productService = productService;
@@ -32,12 +35,13 @@ public class ProductController {
     
     @GetMapping()
     public ResponseEntity<List<Product>> list() {
+        logger.info("ingresando al metodo del controller ProductController::list()");
         return ResponseEntity.ok(productService.findAll());
     }
     
     @GetMapping("{id}")
     public ResponseEntity<Product> details(@PathVariable Long id) {
-        
+        logger.info("ingresando al metodo del controller ProductController::details() con id: {}", id);
         if(id.equals(101L)){
             throw new IllegalStateException("Product not found");
         }
@@ -59,11 +63,13 @@ public class ProductController {
     
     @PostMapping()
     public ResponseEntity<Product> create(@RequestBody Product product) {
+        logger.info("Product creando: {}", product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(product));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+        logger.info("Ingresando metodo ProductController::update con id: {} y product: {}", id, product);
         Optional<Product> productOptional = productService.findById(id);
         if (productOptional.isPresent()) {
             Product productDb = productOptional.orElseThrow();
@@ -80,6 +86,7 @@ public class ProductController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        logger.info("Product eliminando con id: {}", id);
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
