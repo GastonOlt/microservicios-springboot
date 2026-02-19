@@ -45,7 +45,7 @@ public class ItemController {
     @Value("${configuracion.texto}")
     private String msg;
 
-    public ItemController(@Qualifier("itemServiceFeign") ItemService itemService, CircuitBreakerFactory circuitBreakerFactory) {
+    public ItemController(@Qualifier("itemServiceWebClient") ItemService itemService, CircuitBreakerFactory circuitBreakerFactory) {
         this.itemService = itemService;
         this.circuitBreakerFactory = circuitBreakerFactory;
     }

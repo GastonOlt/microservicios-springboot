@@ -18,15 +18,15 @@ import com.gaston.springcloud.msvc.items.models.Item;
 @Service
 public class ItemServiceWebClient implements ItemService {
 
-    private final WebClient.Builder webClient;
+    private final WebClient webClient;
     
-    public ItemServiceWebClient(Builder webClient) {
+    public ItemServiceWebClient(WebClient webClient) {
         this.webClient = webClient;
     }
 
     @Override
     public List<Item> findAll() {
-        return webClient.build()
+        return webClient
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -39,7 +39,7 @@ public class ItemServiceWebClient implements ItemService {
     @Override
     public Optional<Item> findById(Long id) {
         // try {
-             return Optional.of(webClient.build()
+             return Optional.of(webClient
                 .get()
                 .uri("/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
@@ -56,7 +56,7 @@ public class ItemServiceWebClient implements ItemService {
 
     @Override
     public Product save(Product product) {
-        return webClient.build()
+        return webClient
                 .post()
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ public class ItemServiceWebClient implements ItemService {
 
     @Override
     public Product update(Long id, Product product) {
-        return webClient.build()
+        return webClient
                 .put()
                 .uri("/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ public class ItemServiceWebClient implements ItemService {
     
     @Override
     public void deleteById(Long id) {
-        webClient.build()
+        webClient
                 .delete()
                 .uri("/{id}", id)
                 .retrieve()

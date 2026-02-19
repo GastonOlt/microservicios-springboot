@@ -26,14 +26,14 @@ public class UsersService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UsersService.class);
 
     @Autowired
-    private WebClient.Builder client;
+    private WebClient client;
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
             logger.info("Ingresando al proceso de login UsersService::loadUserByUsername con {}", username);
             
-            User user = client.build()
+            User user = client
                     .get()
                     .uri("/username/{username}", username)
                     .accept(MediaType.APPLICATION_JSON)
